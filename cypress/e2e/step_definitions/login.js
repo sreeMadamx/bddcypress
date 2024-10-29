@@ -1,12 +1,12 @@
-import {
-  Given,
-  When,
-  Then,
-} from "@badeball/cypress-cucumber-preprocessor";
+import {Given,When,Then,} from "@badeball/cypress-cucumber-preprocessor";
 import {loginPage} from '@pages/LoginPage'
+import '@shelex/cypress-allure-plugin';
 
-Given("A web browser is at the saucelabs login page", () => {
-  cy.visit("/");
+Given("user navigates to login page url", () => {
+  cy.allure().startStep('Visit login page')
+  cy.visit("/web/index.php/auth/login");
+  cy.get("input[name='username']", {timeout: 10000}).should('be.visible')
+  cy.allure().endStep()
 });
 
 When("A user enters the username {string}, the password {string}, and clicks on the login button", (username,password) => {
