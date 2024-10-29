@@ -21,4 +21,4 @@ jobs:
         run: npm install
 
       - name: Run Cypress tests
-        run: npx cypress run --record --key ${{ secrets.CYPRESS_RECORD_KEY }}
+        run: npx cypress run --record --key b4848846-0655-4fb5-9386-b5097124c360
