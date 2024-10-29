@@ -1,16 +1,24 @@
 name: Cypress Tests
 
-on: [push]
+on:
+  workflow_dispatch:  # Allows manual trigger
+  schedule:           # Sets up a cron job
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
 
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v2
-      # Install NPM dependencies, cache them correctly
-      # and run all Cypress tests
-      - name: Cypress run
-        uses: cypress-io/github-action@v4.2.0 # use the explicit version number
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
         with:
-          command: npm run cypress:execution
+          node-version: '16'  # Adjust the Node.js version as needed
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Cypress tests
+        run: npx cypress run --record --key b4848846-0655-4fb5-9386-b5097124c360
