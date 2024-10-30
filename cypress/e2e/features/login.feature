@@ -4,6 +4,7 @@ Feature: Login page
   Background:
     Given user navigates to login page url
 
+  @smoke  
   Scenario: Success Login
     When user login with valid credentials
     Then user should see home page
