@@ -45,13 +45,15 @@ module.exports = defineConfig({
   projectId: 'bn1uf4',
   e2e: {
     setupNodeEvents,
-    baseUrl: "https://opensource-demo.orangehrmlive.com",
+    baseUrl: "https://www.saucedemo.com/",
     specPattern: "cypress/e2e/features/*.feature",
     screenshotsFolder: 'cypress/screenshots',
     screenshotOnRunFailure: true,
     chromeWebSecurity: false,
     env: {
       allureReuseAfterSpec: true,
+      username: "standard_user",
+      password: "secret_sauce"
     },
   },
 });
