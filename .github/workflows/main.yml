@@ -25,4 +25,9 @@ jobs:
         run: npm install
 
       - name: Run Cypress tests
-        run: npm run cypress:execution-tags --env tags=${{ github.event.inputs.tag }}  # Run with specified tag
+        run: |
+          if [ "${{ github.event.inputs.tag }}" != "" ]; then
+            npm run cypress:execution-tags --env tags=${{ github.event.inputs.tag }}  # Run with specified tag
+          else
+            echo "No tag specified. Skipping test execution."
+          fi
