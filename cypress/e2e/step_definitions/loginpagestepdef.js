@@ -16,3 +16,7 @@ When("user login with valid credentials", () => {
 Then("user should see home page", () => {
   cy.url().should("contains", "/inventory.html");
 });
+
+Then("user verifies list of inventory names", ()=>{
+  
+})

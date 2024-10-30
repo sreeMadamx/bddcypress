@@ -1,5 +1,4 @@
 {
-  "name": "Using fixtures to represent data",
-  "email": "hello@cypress.io",
-  "body": "Fixtures are a great way to mock data for responses to routes"
+  "InventoryList":["Sauce Labs Backpack","Sauce Labs Bike Light","Sauce Labs Bolt T-Shirt","Sauce Labs Fleece Jacket",
+                    "Sauce Labs Onesie","Test.allTheThings() T-Shirt (Red)"]
 }

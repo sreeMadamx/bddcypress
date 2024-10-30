@@ -2,12 +2,17 @@ name: Cypress Tests
 
 on:
   workflow_dispatch:  # Allows manual trigger
+    inputs:
+      tag:
+        description: 'Tag to filter scenarios'
+        required: true
   schedule:           # Sets up a cron job
     - cron: '0 0 * * *'  # Runs daily at midnight UTC
 
 jobs:
   cypress-run:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -21,4 +26,6 @@ jobs:
         run: npm install
 
       - name: Run Cypress tests
-        run: npx cypress run --record --key b4848846-0655-4fb5-9386-b5097124c360
+        run: |
+          npm run cypress:execution-tags --env tags=${{ github.event.inputs.tag }}  # Run with specified tag
+          npx cypress run --record --key b4848846-0655-4fb5-9386-b5097124c360  # Run without tags

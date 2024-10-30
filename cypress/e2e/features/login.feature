@@ -7,5 +7,5 @@ Feature: Login page
   Scenario: Success Login
     When user login with valid credentials
     Then user should see home page
-
+    Then user verifies list of inventory names
 
