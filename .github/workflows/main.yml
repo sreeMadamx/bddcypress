@@ -1,36 +1,77 @@
-name: Cypress Tests
-
-on:
-  workflow_dispatch:  # Allows manual trigger
-    inputs:
-      tag:
-        description: 'Tag to filter scenarios (e.g., smoke, regression, sample)'
-        required: false  # Change to false to allow running without a tag
-        default: 'smoke'  # Default value if none is provided
-  schedule:           # Sets up a cron job
-    - cron: '0 0 * * *'  # Runs daily at midnight UTC
-
+name: pr
+on: [pull_request]
 jobs:
-  cypress-run:
-    runs-on: ubuntu-latest
-
+  pr-tests:
+    runs-on: ubuntu-20.04
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout 🛎
+        uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
+      # run tests tagged "@smoke"
+      # https://github.com/bahmutov/cy-grep
+      - name: Smoke tests 💨
+        # https://github.com/cypress-io/github-action
+        uses: cypress-io/github-action@v5
+        with:
+          build: npm run stop-only
+          start: npm run start:ci
+          # quote the url to be safe against YML parsing surprises
+          wait-on: 'http://localhost:8888'
+          # run only the tests tagged @smoke
+          env: grepTags=@smoke
+          # record the results on the Cypress Dashboard
+          # https://on.cypress.io/dashboard-introduction
+          record: true
+          group: '1 - smoke tests'
+          tag: smoke
+        # environment variables while running Cypress
+        env:
+          # pass the Dashboard record key as an environment variable
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          # pass GitHub token to allow accurately detecting a build vs a re-run build
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install dependencies
-        run: npm install
+      # if smoke tests passed, run all the tests
+      - name: All E2E tests 🧪
+        uses: cypress-io/github-action@v5
+        with:
+          # we have already installed all dependencies above
+          install: false
+          # the server is already running
+          # record the results on the Cypress Dashboard
+          # https://on.cypress.io/dashboard-introduction
+          record: true
+          group: '2 - all tests'
+        # environment variables while running Cypress
+        env:
+          # pass the Dashboard record key as an environment variable
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          # pass GitHub token to allow accurately detecting a build vs a re-run build
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Cypress tests
+      # https://github.com/bahmutov/find-cypress-specs
+      - name: Print test names 🖨
+        run: npm run print-tests
+
+      # confirm the filtering and skipping tests works as expected
+      # using https://github.com/bahmutov/cypress-expect
+      - name: Run using grep 🔎
+        # all specs without the tests are filtered
+        # and all other tests are skipped
         run: |
-          TAG=${{ github.event.inputs.tag }}
-          if [ -n "$TAG" ]; then
-            echo "Running tests with tag: $TAG"
-            npm run cypress:execution-tags --env tags=$TAG  # Run with specified tag
-          else
-            echo "No tag specified. Running all tests."
-            npx cypress run --record --key b4848846-0655-4fb5-9386-b5097124c360  # Adjust as needed for your case
-          fi
+          npx cypress-expect run \
+            --env grep="update state when items are completed" \
+            --expect-exactly expected/one.json
+
+      - name: Run using grep tags 🔎
+        run: |
+          npx cypress-expect run \
+            --env grepTags='@misc' \
+            --expect-exactly expected/tag-misc.json
+
+      - name: Burn tests 🔥
+        run: |
+          npx cypress-expect run \
+            --env burn=3 \
+            --spec cypress/e2e/counter-spec.js \
+            --expect-exactly expected/burn-counter.json
