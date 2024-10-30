@@ -4,8 +4,9 @@ on:
   workflow_dispatch:  # Allows manual trigger
     inputs:
       tag:
-        description: 'Tag to filter scenarios'
+        description: 'Tag to filter scenarios (e.g., smoke, regression, sample, regression)'
         required: true
+        default: 'smoke'  # Default value if none is provided
   schedule:           # Sets up a cron job
     - cron: '0 0 * * *'  # Runs daily at midnight UTC
 
@@ -19,13 +20,9 @@ jobs:
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
-        with:
-          node-version: '16'  # Adjust the Node.js version as needed
 
       - name: Install dependencies
         run: npm install
 
       - name: Run Cypress tests
-        run: |
-          npm run cypress:execution-tags --env tags=${{ github.event.inputs.tag }}  # Run with specified tag
-          npx cypress run --record --key b4848846-0655-4fb5-9386-b5097124c360  # Run without tags
+        run: npm run cypress:execution-tags --env tags=${{ github.event.inputs.tag }}  # Run with specified tag
