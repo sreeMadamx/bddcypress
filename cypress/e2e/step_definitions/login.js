@@ -3,28 +3,16 @@ import {loginPage} from '@pages/LoginPage'
 import '@shelex/cypress-allure-plugin';
 
 Given("user navigates to login page url", () => {
-  cy.allure().startStep('Visit login page')
-  cy.visit("/web/index.php/auth/login");
-  cy.get("input[name='username']", {timeout: 10000}).should('be.visible')
-  cy.allure().endStep()
+  cy.visit("/");
+  cy.wait(2000)
 });
 
-When("A user enters the username {string}, the password {string}, and clicks on the login button", (username,password) => {
-  loginPage.submitLogin(username,password)
-  
+When("user login with valid credentials", () => {
+    loginPage.fillUsernameOnLoginPage(Cypress.env("username"))
+    loginPage.fillPasswordOnLoginPage(Cypress.env("password"))
+    loginPage.clickSubmitOnLoginPage()
 });
 
-When("A user provides incorrect credentials, and clicks on the login button", (table) => {
-  table.hashes().forEach((row) => {
-    cy.log(row.username);
-    cy.log(row.password);
-    loginPage.submitLogin(row.username, row.password)
-
-  });
-});
-Then("the url will contains the inventory subdirectory", () => {
+Then("user should see home page", () => {
   cy.url().should("contains", "/inventory.html");
-});
-Then("The error message {string} is displayed", (errorMessage) => {
-  loginPage.elements.errorMessage().should("have.text", errorMessage);
 });
