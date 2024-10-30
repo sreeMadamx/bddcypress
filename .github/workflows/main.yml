@@ -4,8 +4,8 @@ on:
   workflow_dispatch:  # Allows manual trigger
     inputs:
       tag:
-        description: 'Tag to filter scenarios (e.g., smoke, regression, sample, regression)'
-        required: true
+        description: 'Tag to filter scenarios (e.g., smoke, regression, sample)'
+        required: false  # Change to false to allow running without a tag
         default: 'smoke'  # Default value if none is provided
   schedule:           # Sets up a cron job
     - cron: '0 0 * * *'  # Runs daily at midnight UTC
@@ -26,8 +26,11 @@ jobs:
 
       - name: Run Cypress tests
         run: |
-          if [ "${{ github.event.inputs.tag }}" != "" ]; then
-            npm run cypress:execution-tags --env tags=${{ github.event.inputs.tag }}  # Run with specified tag
+          TAG=${{ github.event.inputs.tag }}
+          if [ -n "$TAG" ]; then
+            echo "Running tests with tag: $TAG"
+            npm run cypress:execution-tags --env tags=$TAG  # Run with specified tag
           else
-            echo "No tag specified. Skipping test execution."
+            echo "No tag specified. Running all tests."
+            npx cypress run --record --key b4848846-0655-4fb5-9386-b5097124c360  # Adjust as needed for your case
           fi
