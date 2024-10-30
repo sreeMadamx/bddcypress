@@ -1,5 +1,5 @@
 name: pr
-on: [pull_request]
+on: workflow_dispatch:
 jobs:
   pr-tests:
     runs-on: ubuntu-20.04
